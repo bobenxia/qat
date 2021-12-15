@@ -2,6 +2,7 @@ import os
 
 import torch
 from .resnet_quant import resnet50
+from .onnx_model import ONNXModel
 
 
 def get_model(use_quantize=False, weights_path=''):
@@ -17,5 +18,13 @@ def get_model(use_quantize=False, weights_path=''):
         print("loading weights:{}".format(weights_path) )
         pretrained_state = torch.load(weights_path, map_location='cuda:0')
         model.load_state_dict(pretrained_state)        
+
+    return model
+
+
+def get_model_onnx(weights_path):
+    if not os.path.exists(weights_path):
+        raise Exception("Pretrain weight:{} doesn't exists".format(weights_path))
+    model = ONNXModel(weights_path)
 
     return model

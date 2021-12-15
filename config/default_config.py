@@ -52,7 +52,7 @@ _C.DATALOADER.NUM_WORKERS = 8
 
 
 # -----------------------------------------------------------------------------
-# TEST 和 QUANTIZATION 主要用于 model_calibrate_test.py
+# TRAIN 主要用于 model_train.py
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # TRAIN
@@ -108,12 +108,12 @@ _C.QUANT.CALIB_SAVE = './outputs/checkpoint_quant_calibrate.pth'
 # -----------------------------------------------------------------------------
 _C.CONVERT_ONNX = CN()
 
-_C.CONVERT_ONNX.QUANT = True
+_C.CONVERT_ONNX.QUANT = False
 _C.CONVERT_ONNX.QUANT_WEIGHTS = './outputs/checkpoint_quant_calibrate.pth'
 _C.CONVERT_ONNX.NORMAL_WEIGHTS = './outputs/checkpoint_normal_train_best.pth'
 _C.CONVERT_ONNX.QUANT_SAVE = './outputs/onnx_quant.onnx'
 _C.CONVERT_ONNX.NORMAL_SAVE = './outputs/onnx_normal.onnx'
-_C.CONVERT_ONNX.DYNAMIC = False
+_C.CONVERT_ONNX.DYNAMIC = True
 _C.CONVERT_ONNX.ONNX_FILE = ''
 _C.CONVERT_ONNX.ONNX_FILE_WITH_DYNAMIC = ''
 _C.CONVERT_ONNX.OPSET_VERSION = 13
@@ -124,3 +124,18 @@ _C.CONVERT_ONNX.DO_CONSTANT_FOLDING = True
 _C.CONVERT_ONNX.INPUT_NAMES = ['input']
 _C.CONVERT_ONNX.OUTPUT_NAMES = ['output']
 
+
+
+
+# -----------------------------------------------------------------------------
+# CONVERT_ONNX 主要用于 model_convert_to_onnx.py
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# CONVERT_ONNX
+# -----------------------------------------------------------------------------
+_C.EVAL = CN()
+
+_C.EVAL.QUANT = False
+_C.EVAL.QUANT_WEIGHTS = './outputs/checkpoint_quant_train_best.pth'
+_C.EVAL.NORMAL_WEIGHTS = './outputs/checkpoint_normal_train_best.pth'
+_C.EVAL.ONNX_WEIGHTS = './outputs/onnx_normal.onnx'
