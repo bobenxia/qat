@@ -30,9 +30,9 @@ from config.default_config import _C as config
 from dataset.build_dataloader import build_train_loader, build_valid_loader
 from dataset.build_dataset import (build_train_dataset_and_sampler,
                                    build_valid_dataset_and_sampler)
-from train_and_eval.evaluate import evaluate, evaluate_onnx
+from train_and_eval.evaluate import evaluate, evaluate_engine, evaluate_onnx
 from train_and_eval.train import train_one_epoch
-from models.get_model import get_model, get_model_onnx
+from models.get_model import get_model, get_model_engine, get_model_onnx
 from utils.accuracy import to_numpy
 
 
@@ -58,10 +58,6 @@ def main():
         raise ValueError('Convert only supports single core.')
     device = torch.device(f'cuda:{args.local_rank}')
 
-    if distributed:
-        torch.cuda.set_device(args.local_rank)
-        torch.distributed.init_process_group(backend='nccl')
-
     
     # 1- load model
     if config.EVAL.QUANT:
@@ -84,6 +80,7 @@ def main():
         model = get_model(config.EVAL.QUANT, config.EVAL.NORMAL_WEIGHTS)
     
     model_onnx = get_model_onnx(config.EVAL.ONNX_WEIGHTS)
+    model_engine = get_model_engine(config.EVAL.ENGINE_WEIGHTS, config.EVAL.ENGINE_MAX_BATCH_SIZE, config.EVAL.ENGINE_INPUT_SHAPE)
     model.to(device)
 
 
@@ -94,7 +91,10 @@ def main():
     data_loader_test = build_valid_loader(dataset_valid, valid_sampler, config, distributed)
     criterion = nn.CrossEntropyLoss()
 
+    # data = next(iter(data_loader_test))
     # 3- eval
+    print("engine model eval:")
+    evaluate_engine(model_engine, criterion, data_loader_test, device)
     print("Onnx model eval:")
     evaluate_onnx(model_onnx, criterion, data_loader_test, device)
     print("Torch model eval:")

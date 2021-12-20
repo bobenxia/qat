@@ -21,6 +21,7 @@ def build_train_loader(dataset_train, train_sampler, config, distributed):
         pin_memory=True,
         worker_init_fn=seed_worker,
         generator=g,
+        drop_last=True
     )
 
     return data_loader_train
@@ -35,6 +36,7 @@ def build_valid_loader(dataset_valid, valid_sampler, config, distributed):
         sampler=valid_sampler, 
         num_workers=num_workers, 
         pin_memory=True,
+        drop_last=True
     )
 
     return data_loader_valid

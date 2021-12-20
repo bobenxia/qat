@@ -1,6 +1,8 @@
 import os
 
 import torch
+
+from .trt_engine import TRTModel
 from .resnet_quant import resnet50
 from .onnx_model import ONNXModel
 
@@ -26,5 +28,12 @@ def get_model_onnx(weights_path):
     if not os.path.exists(weights_path):
         raise Exception("Pretrain weight:{} doesn't exists".format(weights_path))
     model = ONNXModel(weights_path)
+
+    return model
+
+def get_model_engine(weights_path, max_batch_size, input_shape):
+    if not os.path.exists(weights_path):
+        raise Exception("Pretrain weight:{} doesn't exists".format(weights_path))
+    model = TRTModel(weights_path, max_batch_size, input_shape)
 
     return model

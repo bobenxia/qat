@@ -89,8 +89,8 @@ def main():
     torch.manual_seed(2)
     data_input = torch.rand([1,3,224,224]).to(device)
 
-    onnx_file = config.CONVERT_ONNX.QUANT_SAVE \
-            if config.CONVERT_ONNX.QUANT else config.CONVERT_ONNX.NORMAL_SAVE
+    onnx_name = f'onnx_quant_{config.CONVERT_ONNX.QUANT}_dynamic_input_{config.CONVERT_ONNX.DYNAMIC}.onnx'
+    onnx_file = os.path.join(config.CONVERT_ONNX.SAVE_PATH, onnx_name)
     opset_version = config.CONVERT_ONNX.OPSET_VERSION
     verbose = config.CONVERT_ONNX.VERBOSE
     training = config.CONVERT_ONNX.TRAING
@@ -116,10 +116,7 @@ def main():
     # 2-1 onnx simplify
     model_onnx = onnx.load(onnx_file)   
     # # onnx.checker.check_model(model)
-    if config.CONVERT_ONNX.DYNAMIC:
-        model_opt, check_ok = onnxsim.simplify(model_onnx,dynamic_input_shape=True, input_shapes={'input':[1, 3, 224, 224]})
-    else:
-        model_opt, check_ok = onnxsim.simplify(model_onnx,dynamic_input_shape=False, input_shapes={'input':[1, 3, 224, 224]})
+    model_opt, check_ok = onnxsim.simplify(model_onnx,dynamic_input_shape=config.CONVERT_ONNX.DYNAMIC, input_shapes={'input':[1, 3, 224, 224]})
     onnx.save(model_opt, onnx_file)
     print(f"onnx simplify success in {onnx_file}")
 

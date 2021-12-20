@@ -111,11 +111,8 @@ _C.CONVERT_ONNX = CN()
 _C.CONVERT_ONNX.QUANT = False
 _C.CONVERT_ONNX.QUANT_WEIGHTS = './outputs/checkpoint_quant_calibrate.pth'
 _C.CONVERT_ONNX.NORMAL_WEIGHTS = './outputs/checkpoint_normal_train_best.pth'
-_C.CONVERT_ONNX.QUANT_SAVE = './outputs/onnx_quant.onnx'
-_C.CONVERT_ONNX.NORMAL_SAVE = './outputs/onnx_normal.onnx'
+_C.CONVERT_ONNX.SAVE_PATH = './outputs/save_onnx/'
 _C.CONVERT_ONNX.DYNAMIC = True
-_C.CONVERT_ONNX.ONNX_FILE = ''
-_C.CONVERT_ONNX.ONNX_FILE_WITH_DYNAMIC = ''
 _C.CONVERT_ONNX.OPSET_VERSION = 13
 _C.CONVERT_ONNX.VERBOSE = False
 _C.CONVERT_ONNX.TRAING = False
@@ -128,14 +125,17 @@ _C.CONVERT_ONNX.OUTPUT_NAMES = ['output']
 
 
 # -----------------------------------------------------------------------------
-# CONVERT_ONNX 主要用于 model_convert_to_onnx.py
+# EVAL 主要用于 model_eval.py
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
-# CONVERT_ONNX
+# EVAL
 # -----------------------------------------------------------------------------
 _C.EVAL = CN()
 
 _C.EVAL.QUANT = False
 _C.EVAL.QUANT_WEIGHTS = './outputs/checkpoint_quant_train_best.pth'
 _C.EVAL.NORMAL_WEIGHTS = './outputs/checkpoint_normal_train_best.pth'
-_C.EVAL.ONNX_WEIGHTS = './outputs/onnx_normal.onnx'
+_C.EVAL.ONNX_WEIGHTS = './outputs/save_onnx/onnx_quant_False_dynamic_input_True.onnx'
+_C.EVAL.ENGINE_INPUT_SHAPE = (128,3,224,224)
+_C.EVAL.ENGINE_WEIGHTS = './outputs/save_engine/engine_quant_False_dynamic_input_True.engine'
+_C.EVAL.ENGINE_MAX_BATCH_SIZE = 128
