@@ -2,12 +2,34 @@
 
 test qat in tensorrt:v8.2.1.8
 
-## 模型文件管理说明
- `outputs`路径下有保存的模型文件，使用 lfs 管理。
+ ## 使用
+ 主要脚本有四个：`model_train.py`，`model_eval.py`，`model_convert_to_onnx.py` 和 `model_calibrate_test.py`。分别介绍这四个脚本:
 
- 拉取仓库的时候可以使用 `GIT_LFS_SKIP_SMUDGE=1 git clone git@github.com:bobenxia/qat.git 20211208_qat/` 先跳过大文件的下载。
+ ### 1、`model_train.py`
+用于训练模型，包括：普通模型，量化后需要 finetune 的 Qat 模型。需要修改的配置文件在 `config/default_config.py` 中的 `_C.TRAIN` 部分
+举例可以：
+1. 使用 `checkpoint_normal.pth` 训练 `checkpoint_normal_train_best.pth`
+2. 使用 `checkpoint_quant_calibrate.pth` 训练 `checkpoint_quant_train_best.pth`
 
- 后续的拉取可以使用 `git lfs pull origin master`
+ 
+### 2、`model_calibrate.py`
+用于生成 qat 校准模型，校准后需要的 finetune 由上一个脚本实现。需要修改的配置文件在 `config/default_config.py` 中的 `_C.TEST` 和 `_C.QUANT`部分
+举例：
+1. 使用 `checkpoint_normal_train_best.pth` 校准生成 `checkpoint_quant_calibrate.pth`
+
+### 3. `model_convert_to_onnx.py`
+用于将 pth 模型转换成 onnx。需要修改的配置文件在 `config/default_config.py` 中的 `CONVERT_ONNX`部分
+举例：
+1. 使用 `checkpoint_quant_train_best.pth` 准换生成 `save_onnx/onnx_quant_True_dynamic_input_True.onnx`
+
+额外说明：engine 生成没有脚本，直接调用 trtexec 完成。举例：
+```
+/usr/local/TensorRT-8.2.1.8/bin/trtexec --onnx=outputs/save_onnx/onnx_quant_True_dynamic_input_True.onnx --verbose --best --saveEngine=outputs/save_engine/engine_quant_True_dynamic_input_True.engine --minShapes=input:1x3x64x64 --maxShapes=input:256x3x224x224 --optShapes=input:64x3x224x224
+```
+
+### 4. `model_eval.py`
+评测 pth、onnx 和 engine 模型的脚本。修改要评测模型的地址，位置在 `config/default_config.py` 中的 `EVAL`部分
+
 
 ## 记录数据
 平台：rtx2060
@@ -20,7 +42,7 @@ idx|model |ACC@1|ACC@5|type| GPU latency speed(ms)
 2|resbet50_quant_calibrate|75.420|91.430|int8|0.6034
 3|resnet50_quant_QAT|75.730|91.650|int8|
 
- 
+
  模型补充说明：
 
 1. resnet50_orign:  构建的原始的 resnet50，
@@ -34,8 +56,3 @@ idx|model |ACC@1|ACC@5|type| GPU latency speed(ms)
     2. pth 模型为 `outputs/checkpoint_quant_train_best.pth`
 
 
-more:
-1. onnx engine evaluation 代码
-2. nsight 查看 engine 内部结构。如果 ok，推广到其他模型。
-3. https://github.com/NVIDIA/apex/tree/master/apex/contrib/sparsity
-4. https://github.com/NVIDIA/TensorRT/tree/main/plugin#tensorrt-plugins 调研一下 plugin 在 trt 中运行状态。
